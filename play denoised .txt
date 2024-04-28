@@ -1,0 +1,51 @@
+% Prompt the user to enter the name of the file to play
+fileNameToPlay = input('Enter the name of the audio file to play (without extension): ', 's');
+filePathToPlay = fullfile(pwd, [fileNameToPlay '.wav']);
+
+% Check if the file exists
+if exist(filePathToPlay, 'file') == 2
+    % Read the audio file
+    [audioDataToPlay, sampleRate] = audioread(filePathToPlay);
+
+    % Add Gaussian noise with a specified signal-to-noise ratio (SNR)
+    snr = 10; % Adjust the SNR as needed
+    noisyAudioData = awgn(audioDataToPlay, snr, 'measured');
+
+
+    % Apply a simple moving average filter for noise reduction
+window_size = 100; % Adjust the window size as needed
+b = (1/window_size)*ones(1, window_size);
+a = 1;
+denoised_audio = filter(b, a, noisyAudioData);
+
+% Adjust the gain (make it slightly louder)
+gain = 5; % Adjust the gain as needed
+louder_denoised_audio = denoised_audio * gain;
+
+% Create an audioplayer object
+    player = audioplayer(louder_denoised_audio, sampleRate);
+
+       % Play the audio
+    play(player);
+
+    % Wait for the playback to finish
+    while isplaying(player)
+        pause(0.1);
+    end
+
+% Plot the waveform
+    plotWaveform(louder_denoised_audio, sampleRate);
+
+else
+    disp('File does not exist. Please make sure you entered the correct file name.');
+end
+
+function plotWaveform(audioData, sampleRate)
+    % Plot the waveform of the audio
+    time = (0:length(audioData)-1) / sampleRate;
+    figure;
+    plot(time, audioData);
+    title('denoised Waveform');
+    xlabel('Time (seconds)');
+    ylabel('Amplitude');
+end
