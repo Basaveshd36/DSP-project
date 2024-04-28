@@ -1,0 +1,32 @@
+% Initialize variables
+numRecordings = 3;
+audioObjects = cell(1, numRecordings);
+fileNames = cell(1, numRecordings);
+
+for i = 1:numRecordings
+    % Create a unique file name for each recording
+    fileName = input(['Enter a name for recording ' num2str(i) ': '], 's');
+    fileNames{i} = [fileName '.wav'];
+
+    % Create the audiorecorder object
+    audioObjects{i} = audiorecorder;
+
+    % Start recording
+    duration = str2double(input('Enter recording duration (in seconds): ', 's'));
+    msgbox(['Recording ' num2str(i) ' started']);
+    recordblocking(audioObjects{i}, duration);
+    msgbox(['Recording ' num2str(i) ' stopped']);
+
+    % Get the audio data
+    audioData = getaudiodata(audioObjects{i});
+
+    % Specify the file path for each recording
+    filePath = fullfile(pwd, fileNames{i});
+
+    % Write the audio data to a file
+    audiowrite(filePath, audioData, audioObjects{i}.SampleRate);
+
+    msgbox(['Audio file ' num2str(i) ' saved as ' fileNames{i}]);
+        
+
+end
