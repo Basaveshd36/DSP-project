@@ -1,0 +1,41 @@
+% Prompt the user to enter the name of the file to play
+fileNameToPlay = input('Enter the name of the audio file to play (without extension): ', 's');
+filePathToPlay = fullfile(pwd, [fileNameToPlay '.wav']);
+
+% Check if the file exists
+if exist(filePathToPlay, 'file') == 2
+    % Read the audio file
+    [audioDataToPlay, sampleRate] = audioread(filePathToPlay);
+
+    % Add Gaussian noise with a specified signal-to-noise ratio (SNR)
+    snr = 10; % Adjust the SNR as needed
+    noisyAudioData = awgn(audioDataToPlay, snr, 'measured');
+
+
+    % Create an audioplayer object
+    player = audioplayer(noisyAudioData, sampleRate);
+
+    % Play the audio
+    play(player);
+
+    % Wait for the playback to finish
+    while isplaying(player)
+        pause(0.1);
+    end
+
+% Plot the waveform
+    plotWaveform(noisyAudioData, sampleRate);
+
+else
+    disp('File does not exist. Please make sure you entered the correct file name.');
+end
+
+function plotWaveform(audioData, sampleRate)
+    % Plot the waveform of the audio
+    time = (0:length(audioData)-1) / sampleRate;
+    figure;
+    plot(time, audioData);
+    title('Audio Waveform');
+    xlabel('Time (seconds)');
+    ylabel('Amplitude');
+end
